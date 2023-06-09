@@ -2,12 +2,36 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Scanner;
+import java.math.BigInteger;
 
-public class GetDota {
-    public static String getMatch() {
-        String responseData = "";
+//need to convert customURL to steam64ID next step
+
+public class Player {
+    public static final BigInteger FIXED_VALUE = new BigInteger("76561197960265728");
+    public static String getMMR() {
+
+        String responseData;
+
         try {
-            URL url = new URL("https://api.opendota.com/api/players/134253201");
+            String playerID64, playerID32;
+            String strURL;
+
+            Scanner sc = new Scanner(System.in);
+
+            System.out.print("Enter player steam 64-ID:");
+            playerID64 = sc.nextLine();
+
+            //API only uses Steam-32 ID
+            BigInteger bigInteger = new BigInteger(playerID64);
+            bigInteger = bigInteger.subtract(FIXED_VALUE);
+            playerID32 = bigInteger.toString();
+
+            //Append the URL with the steam-32 ID and send a GET request
+            strURL = "https://api.opendota.com/api/players/" + playerID32;
+            System.out.println("test");
+            System.out.println(strURL);
+            URL url = new URL(strURL);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
@@ -29,9 +53,8 @@ public class GetDota {
             }
             else {
                 System.out.println("Error code = " + responseCode);
+                return Integer.toString(responseCode);
             }
-
-            conn.disconnect();
 
         }
         catch (Exception e) {
